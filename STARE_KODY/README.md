@@ -1,2 +1,0 @@
-# azaurezaliczenie
-Zaliczenie azure
