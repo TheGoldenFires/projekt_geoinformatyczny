@@ -2,8 +2,8 @@ name: Sync GIOS Data to Azure SQL
 
 on:
   schedule:
-    - cron: "0 * * * *"  # uruchamia się co godzinę
-  workflow_dispatch:      # pozwala uruchomić ręcznie z zakładki Actions
+    - cron: "0 * * * *"   # co godzinę
+  workflow_dispatch:
 
 jobs:
   sync:
@@ -16,12 +16,20 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
+          python-version: '3.11'
+
+      - name: Install ODBC driver for SQL Server
+        run: |
+          sudo su
+          curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+          curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
+          exit
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18 unixodbc-dev
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install pyodbc requests python-dotenv
+          pip install -r backend/requirements.txt
 
       - name: Run GIOS sync script
         env:
@@ -29,5 +37,4 @@ jobs:
           AZURE_DB: ${{ secrets.AZURE_DB }}
           AZURE_USER: ${{ secrets.AZURE_USER }}
           AZURE_PASS: ${{ secrets.AZURE_PASS }}
-        run: |
-          python backend/fetch_gios_to_sql.py
+        run: python backend/fetch_gios_to_sql.py
