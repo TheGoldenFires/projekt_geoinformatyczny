@@ -2,6 +2,7 @@ import os
 import requests
 import pyodbc
 from dotenv import load_dotenv
+import time
 
 # 1️⃣ Wczytanie danych z .env
 load_dotenv()
@@ -28,11 +29,13 @@ stacje = resp.json()["Lista stacji pomiarowych"]
 print(f"✅ Znaleziono {len(stacje)} stacji GIOŚ")
 
 # 4️⃣ Iteracja po kilku stacjach (na początek 3, potem można zwiększyć)
-for st in stacje[:3]:
+for st in stacje:
     station_id = st["Identyfikator stacji"]
     station_name = st["Nazwa stacji"]
 
     print(f"\n📡 Stacja: {station_name} (ID: {station_id})")
+
+    time.sleep(0.3)
 
     # 🔹 Lista czujników dla danej stacji
     sensors_url = f"https://api.gios.gov.pl/pjp-api/v1/rest/station/sensors/{station_id}"
